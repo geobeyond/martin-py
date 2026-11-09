@@ -42,7 +42,7 @@ Errors are subclasses of `martin_py.MartinError`: `ConfigError`, `UnknownSourceE
 
 ## Layout
 
-The layout follows [mapli](../mapli):
+The layout follows the example structure as from [mapli](https://github.com/geobeyond/mapli):
 
 ```
 martin-py/
