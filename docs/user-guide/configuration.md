@@ -34,7 +34,7 @@ YAML text or a dict are resolved against the process's working directory.
 
 ## Remote GeoParquet on S3
 
-On the `duckdb_enhancement` branch, DuckDB sources authenticate to `s3://` URLs with martin's
+On the `main` branch, DuckDB sources authenticate to `s3://` URLs with martin's
 object-store settings. These are the same settings PMTiles sources use: static keys, a
 profile, or the AWS credential chain. Credentials are cached and refreshed when they expire,
 so a long-lived `TileServer` keeps working with temporary credentials. See the `object_store`

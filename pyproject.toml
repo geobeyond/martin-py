@@ -28,7 +28,7 @@ classifiers = [
 
 [project.urls]
 Repository = "https://github.com/geobeyond/martin-py"
-Martin = "https://github.com/geobeyond/martin/tree/duckdb_enhancement"
+Martin = "https://github.com/geobeyond/martin/tree/main"
 
 [dependency-groups]
 dev = [

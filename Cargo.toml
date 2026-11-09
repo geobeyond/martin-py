@@ -38,15 +38,14 @@ default-members = [".", "martin-py-core"]
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-# martin's own MSRV on the duckdb_enhancement branch
+# martin's own MSRV
 rust-version = "1.98"
 
 [workspace.dependencies]
-# martin is consumed from the sibling checkout (../martin), which must be on the
-# `duckdb_enhancement` branch: that is where the remote-GeoParquet / S3-secret work lives.
+# martin is consumed from the sibling checkout (../martin).
 # To build without a local checkout, swap the paths for a git dependency, e.g.
-#   martin = { git = "https://github.com/geobeyond/martin", branch = "duckdb_enhancement", default-features = false }
-#   martin-tile-utils = { git = "https://github.com/geobeyond/martin", branch = "duckdb_enhancement" }
+#   martin = { git = "https://github.com/geobeyond/martin", branch = "", default-features = false }
+#   martin-tile-utils = { git = "https://github.com/geobeyond/martin", branch = "" }
 martin = { path = "../martin/martin", default-features = false }
 martin-tile-utils = { path = "../martin/martin-tile-utils" }
 

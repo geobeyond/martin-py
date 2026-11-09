@@ -12,10 +12,7 @@ opening a network port or going through HTTP:
 | `/{source_ids}`               | `tilejson()` / `get_source_info()`                       |
 | `/{source_ids}/{z}/{x}/{y}`   | `get_tile()` / `tile()`, async `aget_tile()` / `atile()` |
 
-It binds the `TileServer` path of the [geobeyond/martin `duckdb_enhancement`
-branch](https://github.com/geobeyond/martin/tree/duckdb_enhancement). That branch adds
-DuckDB/GeoParquet sources, including remote `s3://` GeoParquet authenticated through the
-object-store settings.
+It binds the `TileServer` path of the [geobeyond/martin](https://github.com/geobeyond/martin/tree/main).
 
 ```python
 import martin_py
@@ -57,8 +54,7 @@ martin-py/
 
 ## Building
 
-martin is a **path dependency** on the sibling checkout `../martin`. That checkout must be on
-the `duckdb_enhancement` branch. To build without the checkout, switch to the git dependency
+martin is a **path dependency** on the sibling checkout `https://github.com/maplibre/martin/`. To build without the checkout, switch to the git dependency
 that is commented out in [Cargo.toml](Cargo.toml).
 
 ```bash

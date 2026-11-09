@@ -7,8 +7,8 @@ on:
   pull_request:
   workflow_dispatch:
 
-# martin is a path dependency on ../martin, so both repositories are checked out side by side
-# under the workspace: martin-py/ and martin/ (on the duckdb_enhancement branch).
+# martin is a path dependency on https://github.com/maplibre/martin/, so both repositories are checked out side by side
+# under the workspace: martin-py/ and martin/.
 jobs:
   lint_rust:
     runs-on: ubuntu-24.04
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: geobeyond/martin
-          ref: duckdb_enhancement
+          ref: main
           path: martin
 
       - name: "Cache Rust build artifacts"
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: geobeyond/martin
-          ref: duckdb_enhancement
+          ref: main
           path: martin
 
       - name: "Cache Rust build artifacts"
