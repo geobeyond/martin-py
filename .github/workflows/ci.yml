@@ -1,0 +1,85 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+# martin is a path dependency on ../martin, so both repositories are checked out side by side
+# under the workspace: martin-py/ and martin/ (on the duckdb_enhancement branch).
+jobs:
+  lint_rust:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: martin-py
+      - uses: actions/checkout@v7
+        with:
+          repository: geobeyond/martin
+          ref: duckdb_enhancement
+          path: martin
+
+      - name: "Cache Rust build artifacts"
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: martin-py
+
+      - name: "Format Rust code"
+        working-directory: martin-py
+        run: cargo fmt --check
+
+      - name: "Lint Rust code"
+        working-directory: martin-py
+        run: cargo clippy --all-targets -- --deny warnings
+
+  run_ci:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: martin-py
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: martin-py
+      - uses: actions/checkout@v7
+        with:
+          repository: geobeyond/martin
+          ref: duckdb_enhancement
+          path: martin
+
+      - name: "Cache Rust build artifacts"
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: martin-py
+
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: "Run Rust tests"
+        # generous: the first build compiles DuckDB from source
+        timeout-minutes: 45
+        run: cargo test --verbose
+
+      - name: "Install Python code with dev dependencies"
+        run: uv sync --group dev
+
+      - name: "Run ruff linter"
+        run: uv run ruff check
+
+      - name: "Run ruff formatter"
+        run: uv run ruff format --check
+
+      - name: "Run ty"
+        run: uv run ty check
+
+      - name: "Run Python tests"
+        timeout-minutes: 10
+        run: uv run pytest

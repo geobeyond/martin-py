@@ -1,0 +1,67 @@
+[package]
+name = "martin-py"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+name = "_core"
+# "cdylib" is necessary to produce a shared library for Python to import from.
+crate-type = ["cdylib"]
+
+[features]
+# Source kinds compiled into the extension, forwarded to martin-py-core (and from there to martin).
+default = ["pmtiles", "processing", "duckdb"]
+pmtiles = ["martin-py-core/pmtiles"]
+processing = ["martin-py-core/processing"]
+duckdb = ["martin-py-core/duckdb"]
+mbtiles = ["martin-py-core/mbtiles"]
+postgres = ["martin-py-core/postgres"]
+cog = ["martin-py-core/cog"]
+
+[dependencies]
+# "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
+# "abi3-py311" tells pyo3 (and maturin) to build using the stable ABI with minimum Python version 3.11,
+# so one wheel serves every CPython >= 3.11 and its filename does not change with the interpreter.
+# "experimental-async" enables `async fn` in #[pymethods], which return native Python coroutines
+pyo3 = { version = "0.30.1", features = ["extension-module", "abi3-py311", "experimental-async"] }
+martin-py-core = { path = "martin-py-core", default-features = false }
+tracing-subscriber = { version = "0.3", features = ["ansi", "env-filter", "fmt"] }
+
+[workspace]
+members = [".", "martin-py-core"]
+default-members = [".", "martin-py-core"]
+
+# Single source of truth for the project version: both crates inherit it, and maturin uses it as
+# the Python package version too (pyproject.toml declares the version as dynamic).
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+# martin's own MSRV on the duckdb_enhancement branch
+rust-version = "1.98"
+
+[workspace.dependencies]
+# martin is consumed from the sibling checkout (../martin), which must be on the
+# `duckdb_enhancement` branch: that is where the remote-GeoParquet / S3-secret work lives.
+# To build without a local checkout, swap the paths for a git dependency, e.g.
+#   martin = { git = "https://github.com/geobeyond/martin", branch = "duckdb_enhancement", default-features = false }
+#   martin-tile-utils = { git = "https://github.com/geobeyond/martin", branch = "duckdb_enhancement" }
+martin = { path = "../martin/martin", default-features = false }
+martin-tile-utils = { path = "../martin/martin-tile-utils" }
+
+# Profiles of a dependency's workspace are not applied downstream, so martin's own settings are
+# repeated here. `libduckdb-sys.debug = false` matters: with debug info on, the bundled DuckDB is
+# compiled with its internal assertions enabled, and one of them aborts the process
+# (`allocation_count >= size` in allocator.cpp) when a GeoParquet source serves a tile.
+[profile.dev.package]
+libduckdb-sys.debug = false
+sqlx-macros.opt-level = 3
+proc-macro2.debug = false
+quote.debug = false
+unicode-ident.debug = false
+
+[profile.release]
+# smaller, faster extension; martin's own release profile is not applied to a downstream workspace
+lto = "thin"
+codegen-units = 1

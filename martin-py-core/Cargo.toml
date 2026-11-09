@@ -1,0 +1,31 @@
+[package]
+name = "martin-py-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "In-process access to Martin's tile endpoints, without HTTP; the Rust half of martin-py"
+
+[features]
+# `pmtiles` and `processing` (incl. GeoJSON) pull in martin's `_tiles` without requiring a system
+# libpq. `duckdb` maps to martin's `unstable-duckdb`, which builds DuckDB from source (the
+# `bundled` feature of the `duckdb` crate): no system install needed, but a slow first build.
+default = ["pmtiles", "processing", "duckdb"]
+pmtiles = ["martin/pmtiles"]
+processing = ["martin/processing"]
+duckdb = ["martin/unstable-duckdb"]
+mbtiles = ["martin/mbtiles"]
+postgres = ["martin/postgres"]
+cog = ["martin/cog"]
+
+[dependencies]
+futures = "0.3"
+martin.workspace = true
+martin-tile-utils.workspace = true
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

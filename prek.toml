@@ -1,0 +1,49 @@
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "check-toml" },
+  { id = "check-json" },
+  { id = "end-of-file-fixer" },
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  {
+    id = "cargo-fmt",
+    name = "cargo format",
+    language = "system",
+    entry = "cargo fmt",
+    types = ["rust"],
+    pass_filenames = false,
+  },
+  {
+    id = "cargo-clippy",
+    name = "cargo clippy",
+    language = "system",
+    entry = "cargo clippy -- --deny warnings",
+    types = ["rust"],
+    pass_filenames = false,
+  },
+  {
+    id = "ruff-check",
+    name = "ruff check",
+    language = "system",
+    entry = "uvx ruff check",
+    pass_filenames = false,
+  },
+  {
+    id = "ruff-format",
+    name = "ruff format",
+    language = "system",
+    entry = "uvx ruff format",
+    pass_filenames = false,
+  },
+  {
+    id = "ty-check",
+    name = "ty check",
+    language = "system",
+    entry = "uvx ty check",
+    pass_filenames = false,
+  },
+]

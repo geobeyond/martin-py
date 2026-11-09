@@ -1,0 +1,66 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+module-name = "martin_py._core"
+python-packages = ["martin_py"]
+python-source = "src"
+editable-profile = "dev"
+features = ["pyo3/extension-module"]
+
+[project]
+name = "martin-py"
+# taken from the version in Cargo.toml
+dynamic = ["version"]
+description = "Serve Martin tile sources (PMTiles, GeoJSON, DuckDB/GeoParquet, ...) in-process from Python"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+authors = [
+    { name = "Luigi Pirelli", email = "luigi.pirelli@geobeyond.it" }
+]
+requires-python = ">=3.11"
+dependencies = []
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[project.urls]
+Repository = "https://github.com/geobeyond/martin-py"
+Martin = "https://github.com/geobeyond/martin/tree/duckdb_enhancement"
+
+[dependency-groups]
+dev = [
+    "fastapi[standard]>=0.142.2",
+    "maturin>=1.7,<2.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+    "ty>=0.0.84",
+]
+docs = [
+    "mkdocstrings-python>=2.0.10",
+    "ruff>=0.16.10",
+    "zensical>=0.0.71",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# dump the traceback of every thread if a test runs for longer than this, to diagnose hangs
+faulthandler_timeout = 120
+
+[tool.uv]
+# rebuild the extension when the Rust sources change, including martin's (a path dependency)
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "src/**/*.rs" },
+    { file = "martin-py-core/**/*.rs" },
+    { file = "Cargo.toml" },
+    { file = "Cargo.lock" },
+    { file = "../martin/martin/src/**/*.rs" },
+    { file = "../martin/martin-core/src/**/*.rs" },
+]
+
+[tool.ruff]
+# these pages include the example scripts with `--8<--` lines, which ruff would reformat
+extend-exclude = ["docs/examples/*.md"]
