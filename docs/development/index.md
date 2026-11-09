@@ -14,8 +14,7 @@
 
 ## The martin dependency
 
-martin is a path dependency on `../martin`, and that checkout must be on the
-`duckdb_enhancement` branch. `martin::srv` is martin's HTTP layer, not a stable library API,
+martin is a path dependency on `https://github.com/maplibre/martin/`. `martin::srv` is martin's HTTP layer, not a stable library API,
 so after pulling martin, run `cargo check` here first. All martin types are confined to
 `martin-py-core`, so only that crate needs to change when martin's API moves.
 
