@@ -64,3 +64,12 @@ unicode-ident.debug = false
 # smaller, faster extension; martin's own release profile is not applied to a downstream workspace
 lto = "thin"
 codegen-units = 1
+
+# dev profile configs to avoid occupying too much disk space
+[profile.dev]
+# debug = "line-tables-only"   # enough for backtraces; use 0 to drop it entirely
+# debug = 0   # enough for backtraces; use 0 to drop it entirely
+incremental = false
+
+[profile.dev.package."*"]
+debug = false                # no debug info for dependencies
