@@ -85,6 +85,16 @@ uv lock --upgrade-package martin-py
 uv sync --reinstall-package martin-py
 ```
 
+if you setup `FASTGEOAPI_MARTIN_WRAPPER_CONFIG` you should also install martin_wrapper. In case it is not installed you'll receive the following warning and no resource based on GeoParquetProvider/DuckDB wll be shown loaded.
+```
+2026-11-13 09:39:30.652 | WARNING  | app.main:create_app:379 [id:None] - FASTGEOAPI_MARTIN_WRAPPER_CONFIG is set but the optional `martin-py` wrapper dependency is not installed (install it with `uv sync --extra martin_wrapper`); /geoapi/martin-wrapper will not be mounted.
+```
+
+wrapper will be loaded with the following command
+```bash
+uv sync --extra martin_wrapper
+```
+
 ### Source kinds
 
 Cargo features select which source kinds are compiled in. The default is `pmtiles`,
