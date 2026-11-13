@@ -18,7 +18,7 @@ jobs:
           path: martin-py
       - uses: actions/checkout@v7
         with:
-          repository: geobeyond/martin
+          repository: https://github.com/maplibre
           ref: main
           path: martin
 
@@ -46,7 +46,7 @@ jobs:
           path: martin-py
       - uses: actions/checkout@v7
         with:
-          repository: geobeyond/martin
+          repository: https://github.com/maplibre/martin
           ref: main
           path: martin
 
