@@ -42,12 +42,16 @@ edition = "2024"
 rust-version = "1.98"
 
 [workspace.dependencies]
-# martin is consumed from the sibling checkout (../martin).
-# To build without a local checkout, swap the paths for a git dependency, e.g.
-#   martin = { git = "https://github.com/geobeyond/martin", branch = "", default-features = false }
-#   martin-tile-utils = { git = "https://github.com/geobeyond/martin", branch = "" }
-martin = { path = "../martin/martin", default-features = false }
-martin-tile-utils = { path = "../martin/martin-tile-utils" }
+# martin is consumed from crates.io. martin 2.x is still in beta and `martin::srv` is not a stable
+# library API, so the version is pinned exactly; bump it deliberately and run `cargo check`.
+# To build against a local checkout instead (e.g. unreleased martin changes), add a git-ignored
+# `.cargo/config.toml` with a patch; the checkout's version must satisfy the requirement below:
+#   [patch.crates-io]
+#   martin = { path = "../martin/martin" }
+#   martin-core = { path = "../martin/martin-core" }
+#   martin-tile-utils = { path = "../martin/martin-tile-utils" }
+martin = { version = "=2.0.0-beta.7", default-features = false }
+martin-tile-utils = "0.9.3"
 
 # Profiles of a dependency's workspace are not applied downstream, so martin's own settings are
 # repeated here. `libduckdb-sys.debug = false` matters: with debug info on, the bundled DuckDB is
@@ -67,7 +71,7 @@ codegen-units = 1
 
 # dev profile configs to avoid occupying too much disk space
 [profile.dev]
-# debug = "line-tables-only"   # enough for backtraces; use 0 to drop it entirely
+debug = "line-tables-only"   # enough for backtraces; use 0 to drop it entirely
 # debug = 0   # enough for backtraces; use 0 to drop it entirely
 incremental = false
 

@@ -14,8 +14,8 @@
 
 ## The martin dependency
 
-martin is a path dependency on `https://github.com/maplibre/martin/`. `martin::srv` is martin's HTTP layer, not a stable library API,
-so after pulling martin, run `cargo check` here first. All martin types are confined to
+martin is a crates.io dependency, pinned to an exact version. `martin::srv` is martin's HTTP layer, not a stable library API,
+so after bumping the version, run `cargo check` here first. All martin types are confined to
 `martin-py-core`, so only that crate needs to change when martin's API moves.
 
 `Cargo.lock` was seeded from martin's own lock file, so this workspace builds the same

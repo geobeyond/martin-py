@@ -54,8 +54,9 @@ martin-py/
 
 ## Building
 
-martin is a **path dependency** on the sibling checkout `https://github.com/maplibre/martin/`. To build without the checkout, switch to the git dependency
-that is commented out in [Cargo.toml](Cargo.toml).
+martin is a crates.io dependency, pinned to an exact version in [Cargo.toml](Cargo.toml), so no
+martin checkout is needed. To build against a local checkout instead, see the `[patch.crates-io]`
+note next to the dependency.
 
 ```bash
 uv sync                  # builds the extension (debug) into .venv, with the dev group
@@ -102,8 +103,14 @@ Cargo features select which source kinds are compiled in. The default is `pmtile
 and `cog` are available too:
 
 ```bash
-uv run maturin build --release --compatibility linux --features postgres,mbtiles
+VERSION=$(grep -m1 '^version = ' Cargo.toml | cut -d'"' -f2)
+uv run maturin build --release --compatibility linux --features postgres,mbtiles \
+    --out "target/wheels/martin-py-${VERSION}-wheel-linux"
+# -> target/wheels/martin-py-0.1.0-wheel-linux/martin_py-0.1.0-cp311-abi3-linux_x86_64.whl
 ```
+
+The output directory is named like the `martin-py-<version>-wheel-linux` artifact uploaded by CI.
+The wheel file itself keeps maturin's standard name, which pip requires to install it.
 
 At least one source-kind feature must be enabled.
 

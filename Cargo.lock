@@ -1518,7 +1518,9 @@ checksum = "0c9ea0ac24bc397ab3c98583a3c9ba74fa56b09a4449bbe172b9b1ddb016027a"
 
 [[package]]
 name = "cog-tiles"
-version = "0.3.0"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c881025cb2b112a1029d3829a146f2b779115dbd64ea7913ee3bb571bf89bc9"
 dependencies = [
  "async-tiff",
  "async-trait",
@@ -4057,6 +4059,8 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "map-tile-toolkit"
 version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c082f8960343b24fa9ac7f9e81b4fb3edb345f1a4fda1cbbcfa5a4e67b336f6c"
 dependencies = [
  "geo-types",
  "thiserror 2.0.21",
@@ -4064,7 +4068,9 @@ dependencies = [
 
 [[package]]
 name = "martin"
-version = "2.0.0-beta.6"
+version = "2.0.0-beta.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18bf5268c70879dd6b0cc615a0e490501f887226487251171ebbf0483b1ab587"
 dependencies = [
  "actix-cors",
  "actix-http",
@@ -4127,6 +4133,8 @@ dependencies = [
 [[package]]
 name = "martin-config-macros"
 version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e900a19cd2607c77613019709a0c28bfb13b41578bfda6357b120d1aaee18db"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4135,7 +4143,9 @@ dependencies = [
 
 [[package]]
 name = "martin-core"
-version = "0.16.0"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "147a0ac498d8a566cb1217696772f3d9b28505b330d56fca5a033b6f90347167"
 dependencies = [
  "backon",
  "base64 0.23.1",
@@ -4211,6 +4221,8 @@ dependencies = [
 [[package]]
 name = "martin-tile-utils"
 version = "0.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95cd846f0cc29a27821938f6faa1ab30f5bd28bfc5548b8f0c31982297b65bc2"
 dependencies = [
  "brotli",
  "bytes",
@@ -4225,7 +4237,9 @@ dependencies = [
 
 [[package]]
 name = "martin-tilegen"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8642c8b6131dedf527984086c6d72b3e0c05d8f7664972aa59f1cc6ba7d2b96f"
 dependencies = [
  "bytes",
  "bytestring",
@@ -4267,7 +4281,9 @@ dependencies = [
 
 [[package]]
 name = "mbtiles"
-version = "0.22.0"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d63c40ed70e95012ea89df4a3de453d6f2ca927984cfb0bd6593757513fcc4f"
 dependencies = [
  "anyhow",
  "bytes",

@@ -50,15 +50,13 @@ testpaths = ["tests"]
 faulthandler_timeout = 120
 
 [tool.uv]
-# rebuild the extension when the Rust sources change, including martin's (a path dependency)
+# rebuild the extension when the Rust sources or the locked dependency versions change
 cache-keys = [
     { file = "pyproject.toml" },
     { file = "src/**/*.rs" },
     { file = "martin-py-core/**/*.rs" },
     { file = "Cargo.toml" },
     { file = "Cargo.lock" },
-    { file = "../martin/martin/src/**/*.rs" },
-    { file = "../martin/martin-core/src/**/*.rs" },
 ]
 
 [tool.ruff]

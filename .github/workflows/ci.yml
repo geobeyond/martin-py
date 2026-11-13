@@ -7,53 +7,28 @@ on:
   pull_request:
   workflow_dispatch:
 
-# martin is a path dependency on https://github.com/maplibre/martin/, so both repositories are checked out side by side
-# under the workspace: martin-py/ and martin/.
 jobs:
   lint_rust:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-        with:
-          path: martin-py
-      - uses: actions/checkout@v7
-        with:
-          repository: maplibre/martin
-          ref: main
-          path: martin
 
       - name: "Cache Rust build artifacts"
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          workspaces: martin-py
 
       - name: "Format Rust code"
-        working-directory: martin-py
         run: cargo fmt --check
 
       - name: "Lint Rust code"
-        working-directory: martin-py
         run: cargo clippy --all-targets -- --deny warnings
 
   run_ci:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: martin-py
     steps:
       - uses: actions/checkout@v7
-        with:
-          path: martin-py
-      - uses: actions/checkout@v7
-        with:
-          repository: maplibre/martin
-          ref: main
-          path: martin
 
       - name: "Cache Rust build artifacts"
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          workspaces: martin-py
 
       - name: "Set up uv"
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
@@ -83,3 +58,24 @@ jobs:
       - name: "Run Python tests"
         timeout-minutes: 10
         run: uv run pytest
+
+      - name: "Build release wheel"
+        timeout-minutes: 45
+        run: uv run maturin build --release --compatibility linux --features postgres,mbtiles
+
+      - name: "Read wheel version"
+        id: wheel
+        # wheel filename: <name>-<version>-<python tag>-<abi tag>-<platform tag>.whl
+        run: |
+          wheel=$(ls target/wheels/*.whl)
+          version=$(basename "$wheel" | cut -d- -f2)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Downloadable from other repositories, e.g. with actions/download-artifact using
+      # `repository: <owner>/martin-py`, `run-id: <run id>` and a `github-token` with actions:read on this repo.
+      - name: "Upload wheel artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: martin-py-${{ steps.wheel.outputs.version }}-wheel-linux
+          path: target/wheels/*.whl
+          if-no-files-found: error
