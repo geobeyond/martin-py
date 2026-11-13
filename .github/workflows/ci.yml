@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    # pushing a version tag (e.g. v0.1.0) also publishes the wheel as a GitHub Release asset
+    tags:
+      - "v*"
   pull_request:
   workflow_dispatch:
 
@@ -24,6 +27,8 @@ jobs:
 
   run_ci:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write # create the GitHub Release on version tags
     steps:
       - uses: actions/checkout@v7
 
@@ -79,3 +84,18 @@ jobs:
           name: martin-py-${{ steps.wheel.outputs.version }}-wheel-linux
           path: target/wheels/*.whl
           if-no-files-found: error
+
+      # Public, stable .whl URL for other projects (fastgeoapi points its uv source at it):
+      #   https://github.com/<owner>/martin-py/releases/download/v<version>/<wheel filename>
+      - name: "Publish wheel to GitHub Release"
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.wheel.outputs.version }}
+        run: |
+          if [ "$TAG" != "v$VERSION" ]; then
+            echo "::error::tag $TAG does not match the crate version $VERSION (Cargo.toml [workspace.package])"
+            exit 1
+          fi
+          gh release create "$TAG" target/wheels/*.whl --title "$TAG" --generate-notes
