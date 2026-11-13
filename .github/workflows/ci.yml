@@ -18,7 +18,7 @@ jobs:
           path: martin-py
       - uses: actions/checkout@v7
         with:
-          repository: https://github.com/maplibre
+          repository: maplibre/martin
           ref: main
           path: martin
 
@@ -46,7 +46,7 @@ jobs:
           path: martin-py
       - uses: actions/checkout@v7
         with:
-          repository: https://github.com/maplibre/martin
+          repository: maplibre/martin
           ref: main
           path: martin
 
