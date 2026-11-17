@@ -4198,7 +4198,7 @@ dependencies = [
 
 [[package]]
 name = "martin-py"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "martin-py-core",
  "pyo3",
@@ -4207,7 +4207,7 @@ dependencies = [
 
 [[package]]
 name = "martin-py-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "futures",
  "martin",

@@ -36,7 +36,7 @@ default-members = [".", "martin-py-core"]
 # Single source of truth for the project version: both crates inherit it, and maturin uses it as
 # the Python package version too (pyproject.toml declares the version as dynamic).
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 # martin's own MSRV
 rust-version = "1.98"
