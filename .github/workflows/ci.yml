@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    # pushing a version tag (e.g. v0.1.0) also publishes the wheel as a GitHub Release asset
+    # pushing a version tag (e.g. v0.1.0) also publishes the wheels as GitHub Release assets
     tags:
       - "v*"
   pull_request:
@@ -27,8 +27,6 @@ jobs:
 
   run_ci:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write # create the GitHub Release on version tags
     steps:
       - uses: actions/checkout@v7
 
@@ -64,9 +62,54 @@ jobs:
         timeout-minutes: 10
         run: uv run pytest
 
+  # One wheel per platform: the extension is built for the stable ABI (abi3-py311), so each
+  # wheel serves every CPython >= 3.11 on its platform. Built natively on each runner.
+  wheels:
+    needs: run_ci
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, name: linux-x86_64, compatibility: "--compatibility linux" }
+          - { runner: ubuntu-24.04-arm, name: linux-aarch64, compatibility: "--compatibility linux" }
+          - { runner: macos-latest, name: macos-arm64, compatibility: "" }
+          - { runner: macos-15-intel, name: macos-x86_64, compatibility: "" }
+          - { runner: windows-latest, name: windows-x86_64, compatibility: "" }
+    runs-on: ${{ matrix.runner }}
+    env:
+      # fixes the macOS wheels' platform tag (macosx_11_0_<arch>), so the release URLs other
+      # projects point at are predictable; ignored on Linux and Windows
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: "Cache Rust build artifacts"
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
       - name: "Build release wheel"
-        timeout-minutes: 45
-        run: uv run maturin build --release --compatibility linux --features postgres,mbtiles
+        # generous: compiles DuckDB from source, slowest on Windows
+        timeout-minutes: 90
+        # maturin as a tool, not via `uv run`: that would first build the project into .venv
+        run: >-
+          uvx --from "maturin>=1.7,<2.0" maturin build --release
+          ${{ matrix.compatibility }} --features postgres,mbtiles
+
+      - name: "Check the wheel imports"
+        run: |
+          uv venv --python 3.12 .wheel-check
+          uv pip install --python .wheel-check target/wheels/*.whl
+          uv run --no-project --python .wheel-check python -c "import martin_py"
 
       - name: "Read wheel version"
         id: wheel
@@ -81,21 +124,36 @@ jobs:
       - name: "Upload wheel artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: martin-py-${{ steps.wheel.outputs.version }}-wheel-linux
+          name: martin-py-${{ steps.wheel.outputs.version }}-wheel-${{ matrix.name }}
           path: target/wheels/*.whl
           if-no-files-found: error
 
-      # Public, stable .whl URL for other projects (fastgeoapi points its uv source at it):
-      #   https://github.com/<owner>/martin-py/releases/download/v<version>/<wheel filename>
-      - name: "Publish wheel to GitHub Release"
-        if: startsWith(github.ref, 'refs/tags/v')
+  # Public, stable .whl URLs for other projects (fastgeoapi points its uv source at them):
+  #   https://github.com/<owner>/martin-py/releases/download/v<version>/<wheel filename>
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: wheels
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # create the GitHub Release
+    steps:
+      - name: "Download every platform's wheel"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: martin-py-*-wheel-*
+          path: dist
+          merge-multiple: true
+
+      - name: "Publish wheels to GitHub Release"
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
-          VERSION: ${{ steps.wheel.outputs.version }}
         run: |
-          if [ "$TAG" != "v$VERSION" ]; then
-            echo "::error::tag $TAG does not match the crate version $VERSION (Cargo.toml [workspace.package])"
+          ls -l dist
+          version=$(basename "$(ls dist/*.whl | head -n 1)" | cut -d- -f2)
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::tag $TAG does not match the crate version $version (Cargo.toml [workspace.package])"
             exit 1
           fi
-          gh release create "$TAG" target/wheels/*.whl --title "$TAG" --generate-notes
+          gh release create "$TAG" dist/*.whl --title "$TAG" --generate-notes
